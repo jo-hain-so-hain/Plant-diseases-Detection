@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://miro.medium.com/max/1400/1*u5W3EjhWr1-zUFxTB4mWaQ.png" />
+    <title> Plant Disease Detection</title>
+    <style>
+        html{
+            font-size: 10px;
+        }
+        body{
+            margin:0px;
+            box-sizing: border-box;
+            background-color: rgba(0,0,0,0.7);
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container{
+            width: 80vw;
+            height: 80vh;
+            background-color: rgba(0,0,0,0.6);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        a{
+            text-decoration: none;
+            text-align: center;
+        }
+
+        a:hover .button{
+            background-color: orange;
+            color: white;
+            box-shadow: 0 0 50px orange ;
+        }
+        .button{
+            width: 30rem;
+            height: 30rem;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.6);
+            box-shadow: 0 0 10px rgba(255,255,255,0.6) ;
+            color: black;
+            font-size: 4rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.5s ease-in-out;
+        }
+
+        input{
+            display: none;
+        }
+
+        .image-upload{
+            width: 60vw;
+            height: 50vh;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .category{
+            padding-top: 20px;
+            display: none;
+            justify-content: center;
+            text-align: center;
+            align-items: center;
+            font-size: 3rem;
+            color:white;
+        }
+
+        @media (max-width:400px) {
+            html{
+                font-size:8px;
+            } 
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+       <input type="file" class="uploadImage" accept="image/gif, image/jpeg, image/png"/>
+       <img class="image-upload"/>
+       <a href="#"> <div class="button"> Click To Upload </div> </a> 
+       <div class="category"></div>
+    </div>
+
+
+
+    <script>
+        var btn=document.querySelector(".button");
+        var uploader=document.querySelector(".uploadImage");
+        var image=document.querySelector(".image-upload");
+        var disease=document.querySelector(".category");
+        btn.addEventListener('click',(eve)=>{
+           eve.preventDefault();
+           uploader.click();
+           uploader.onchange=(e)=>{
+                e.preventDefault();
+                var filepath=e.target.files;
+                image.style.display="block";
+                image.src=URL.createObjectURL(e.target.files[0]);
+                const formdata=new FormData();
+                formdata.append('plant_image',filepath[0]);
+                btn.style.display="none"; 
+                const url="http://localhost:8000/predict/";
+                fetch(url,{
+                    method:'POST',
+                    body:formdata,
+                }).then(
+                    (res)=> res.json()
+                ).then(
+                    (res)=>{
+                        var disName=res.dis;
+                        disName=disName.replaceAll("_"," ");
+                        // console.log(disName);
+                        disease.innerHTML=disName;
+                        disease.style.display='block';
+                    }
+                )
+           }
+            
+        });
+    </script>
+</body>
+</html>
